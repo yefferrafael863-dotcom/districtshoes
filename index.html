@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>District Shoes · Catálogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0b; --panel:#141414; --line:#242424;
+    --gold:#e8b04a; --gold-soft:rgba(232,176,74,.14);
+    --ink:#f4f1ea; --muted:#9a968e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  img{display:block;max-width:100%}
+
+  /* Portada */
+  .hero{position:relative;min-height:min(52vh,560px);display:grid;place-items:center;text-align:center;padding:56px 20px 40px;overflow:hidden;isolation:isolate}
+  .hero::before{content:"";position:absolute;inset:-20px;background:url(ref13.jpg) center 40%/cover;filter:blur(18px) brightness(.32) saturate(1.1);z-index:-2}
+  .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 0%,rgba(11,11,11,.55) 55%,var(--bg) 100%);z-index:-1}
+  .hero img.logo{width:min(380px,78vw);margin:0 auto 22px;filter:drop-shadow(0 6px 24px rgba(0,0,0,.6))}
+  .hero .kicker{font-family:Anton,Impact,sans-serif;letter-spacing:.32em;font-size:clamp(14px,2.4vw,18px);color:var(--gold);text-transform:uppercase}
+  .hero p.sub{margin-top:12px;color:#cfcac0;font-size:15px;max-width:440px;margin-inline:auto;line-height:1.55}
+
+  /* Filtros */
+  .bar{position:sticky;top:0;z-index:10;background:rgba(11,11,11,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .bar-inner{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+  .group{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .group .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+  .chip{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:600 13px Inter,sans-serif;padding:8px 14px;border-radius:999px;cursor:pointer;transition:.15s}
+  .chip:hover{border-color:#3a3a3a}
+  .chip.on{background:var(--gold);border-color:var(--gold);color:#111}
+  .chip.size{padding:7px 11px;min-width:40px}
+  .count{font-size:13px;color:var(--muted)}
+  @media (max-width:560px){
+    .bar-inner{gap:8px;padding:10px 12px}
+    #sizes{flex-wrap:nowrap;overflow-x:auto;width:100%;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    #sizes::-webkit-scrollbar{display:none}
+    .count{width:100%}
+  }
+
+  /* Grilla */
+  main{max-width:1180px;margin:0 auto;padding:26px 18px 60px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
+  @media (max-width:560px){.grid{grid-template-columns:1fr 1fr;gap:12px} main{padding:18px 12px 48px}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .2s,border-color .2s;display:flex;flex-direction:column}
+  .card:hover{transform:translateY(-3px);border-color:#3b3326}
+  .ph{position:relative;aspect-ratio:4/5;background:#1b1b1b;overflow:hidden}
+  .ph img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+  .card:hover .ph img{transform:scale(1.04)}
+  .badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);color:var(--ink);font:700 10.5px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:5px 9px;border-radius:999px}
+  .size-tag{position:absolute;bottom:10px;right:10px;background:var(--gold);color:#111;font:800 13px Inter,sans-serif;padding:6px 10px;border-radius:10px;line-height:1}
+  .size-tag small{display:block;font-size:8.5px;letter-spacing:.14em;font-weight:700;margin-bottom:2px;opacity:.75}
+  .info{padding:13px 14px 15px;display:flex;flex-direction:column;gap:5px}
+  .ref{font-size:11px;letter-spacing:.16em;color:var(--gold);font-weight:700}
+  .name{font-family:Anton,Impact,sans-serif;font-size:19px;letter-spacing:.02em;line-height:1.15;text-transform:uppercase}
+  .tag{font-size:13px;color:var(--muted);line-height:1.4}
+  @media (max-width:560px){.name{font-size:15px}.tag{font-size:12px}.info{padding:10px 10px 12px}}
+  .empty{text-align:center;color:var(--muted);padding:60px 0;display:none}
+
+  /* Visor */
+  .viewer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+  .viewer.open{display:flex}
+  .viewer-box{max-width:920px;width:100%;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:center}
+  .viewer img{width:100%;border-radius:14px;max-height:84vh;object-fit:contain;background:#111}
+  .viewer .vref{color:var(--gold);letter-spacing:.18em;font-size:12px;font-weight:700}
+  .viewer h2{font-family:Anton,Impact,sans-serif;font-size:clamp(26px,4vw,40px);text-transform:uppercase;line-height:1.05;margin:8px 0 12px;font-weight:400}
+  .viewer .vtag{color:#cfcac0;line-height:1.55}
+  .facts{display:flex;gap:10px;margin-top:18px}
+  .fact{border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:96px}
+  .fact span{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .fact b{font-size:18px}
+  .close,.nav{position:fixed;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff;width:44px;height:44px;border-radius:999px;font-size:20px;cursor:pointer;display:grid;place-items:center}
+  .close{top:16px;right:16px}
+  .nav.prev{left:16px;top:50%}.nav.next{right:16px;top:50%}
+  @media (max-width:720px){.viewer-box{grid-template-columns:1fr;gap:14px}.viewer img{max-height:56vh}.nav{top:auto;bottom:18px}.nav.prev{left:calc(50% - 54px)}.nav.next{right:calc(50% - 54px)}}
+
+  footer{border-top:1px solid var(--line);text-align:center;padding:34px 20px 44px;color:var(--muted);font-size:13px}
+  footer img{width:150px;margin:0 auto 14px;opacity:.9}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div>
+    <img class="logo" src="logo.png" alt="District Shoes">
+    <div class="kicker">Catálogo · Colección actual</div>
+    <p class="sub">Toca cualquier par para verlo en grande. Filtra por género o por talla.</p>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="bar-inner">
+    <div class="group" id="gender">
+      <button class="chip on" data-g="all">Todos</button>
+      <button class="chip" data-g="M">Hombre</button>
+      <button class="chip" data-g="F">Mujer</button>
+    </div>
+    <div class="group" id="sizes"><span class="lbl">Talla</span></div>
+    <div class="count" id="count"></div>
+  </div>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">No hay pares con ese filtro por ahora.</div>
+</main>
+
+<footer>
+  <img src="logo.png" alt="District Shoes">
+  <div>District Shoes · Catálogo actualizado constantemente</div>
+</footer>
+
+<div class="viewer" id="viewer" aria-modal="true" role="dialog">
+  <button class="close" id="vclose" aria-label="Cerrar">✕</button>
+  <button class="nav prev" id="vprev" aria-label="Anterior">‹</button>
+  <button class="nav next" id="vnext" aria-label="Siguiente">›</button>
+  <div class="viewer-box">
+    <img id="vimg" alt="">
+    <div>
+      <div class="vref" id="vref"></div>
+      <h2 id="vname"></h2>
+      <p class="vtag" id="vtag"></p>
+      <div class="facts">
+        <div class="fact"><span>Talla</span><b id="vsize"></b></div>
+        <div class="fact"><span>Género</span><b id="vgen"></b></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== PRODUCTOS =====
+   Para agregar uno nuevo: copia una línea, cambia los datos y sube la foto refXX.jpg */
+const PRODUCTOS = [
+  {ref:"01", g:"M", talla:43, img:"ref01.jpg", nombre:"Air Max Tailwind IV Aqua Volt",  tag:"Verde agua, azul rey y volt. Un clásico runner que no pasa desapercibido."},
+  {ref:"02", g:"F", talla:36, img:"ref02.jpg", nombre:"Nike ACG Zip Violeta",           tag:"Morado intenso con cierre frontal. Estilo outdoor con mucha actitud."},
+  {ref:"03", g:"M", talla:39, img:"ref03.jpg", nombre:"Air Max Dn2 Negro/Blanco",       tag:"Negro total con suela blanca y burbujas de aire. Fácil de combinar."},
+  {ref:"04", g:"F", talla:38, img:"ref04.jpg", nombre:"Knit Runner Gris Perla",         tag:"Tejido liviano y transpirable. Comodidad para todo el día."},
+  {ref:"05", g:"F", talla:37, img:"ref05.jpg", nombre:"Air Max Portal Rosa/Plata",      tag:"Rosa salmón con detalles plateados. Delicados y llamativos a la vez."},
+  {ref:"06", g:"M", talla:42, img:"ref06.jpg", nombre:"Amiri MA Runner Blanco/Rojo",    tag:"Silueta chunky de lujo, gamuza gris y degradado rojo."},
+  {ref:"07", g:"M", talla:39, img:"ref07.jpg", nombre:"Nike Flyknit Oliva/Azul",        tag:"Tejido texturizado con cordones crema. Estilo casual premium."},
+  {ref:"08", g:"M", talla:39, img:"ref08.jpg", nombre:"BOSS Runner Negro/Gris",         tag:"Elegancia urbana. Perfectos para ir del trabajo al plan."},
+  {ref:"09", g:"F", talla:39, img:"ref09.jpg", nombre:"Air Max Portal Rojo/Negro",      tag:"Rojo vibrante y negro con detalles neón. Para destacar."},
+  {ref:"10", g:"M", talla:40, img:"ref10.jpg", nombre:"Air Max Blanco Total",           tag:"Blanco impecable con suela de tacos. Limpios y con presencia."},
+  {ref:"11", g:"M", talla:43, img:"ref11.jpg", nombre:"Air Max Tailwind IV Blanco/Rojo",tag:"El Tailwind de siempre en blanco con rojo intenso."},
+  {ref:"12", g:"F", talla:36, img:"ref12.jpg", nombre:"Urban Classic Blanco",           tag:"Plataforma blanca minimalista. Combinan con todo."},
+  {ref:"13", g:"M", talla:43, img:"ref13.jpg", nombre:"Air Max Tailwind IV Azul/Amarillo",tag:"Azul rey con amarillo. Puro estilo noventero."},
+  {ref:"14", g:"M", talla:43, img:"ref14.jpg", nombre:"Air Max Tailwind IV Turquesa/Volt",tag:"Turquesa y volt sobre blanco. Frescos y deportivos."},
+  {ref:"15", g:"F", talla:38, img:"ref15.jpg", nombre:"Vans Knu Skool Negro/Blanco",    tag:"Gamuza negra y cordones gruesos. El skate clásico, inflado."},
+  {ref:"16", g:"M", talla:39, img:"ref16.jpg", nombre:"Adidas Country Blanco/Negro",    tag:"Tres rayas, gamuza y suela caramelo. Retro que nunca falla."}
+];
+
+const GEN = {M:"Hombre", F:"Mujer"};
+let fG = "all", fS = null, visibles = [], idx = 0;
+
+const grid = document.getElementById("grid");
+const sizesEl = document.getElementById("sizes");
+
+[...new Set(PRODUCTOS.map(p => p.talla))].sort((a,b)=>a-b).forEach(t => {
+  const b = document.createElement("button");
+  b.className = "chip size"; b.textContent = t; b.dataset.s = t;
+  b.onclick = () => { fS = (fS === t) ? null : t; render(); };
+  sizesEl.appendChild(b);
+});
+document.querySelectorAll("#gender .chip").forEach(b => b.onclick = () => { fG = b.dataset.g; render(); });
+
+function render(){
+  document.querySelectorAll("#gender .chip").forEach(b => b.classList.toggle("on", b.dataset.g === fG));
+  document.querySelectorAll("#sizes .chip").forEach(b => b.classList.toggle("on", +b.dataset.s === fS));
+  visibles = PRODUCTOS.filter(p => (fG === "all" || p.g === fG) && (fS === null || p.talla === fS));
+  grid.innerHTML = visibles.map((p,i) => `
+    <article class="card" data-i="${i}">
+      <div class="ph">
+        <img src="${p.img}" alt="${p.nombre}" loading="lazy">
+        <span class="badge">${GEN[p.g]}</span>
+        <span class="size-tag"><small>TALLA</small>${p.talla}</span>
+      </div>
+      <div class="info">
+        <div class="ref">REF. ${p.ref}</div>
+        <div class="name">${p.nombre}</div>
+        <div class="tag">${p.tag}</div>
+      </div>
+    </article>`).join("");
+  document.getElementById("empty").style.display = visibles.length ? "none" : "block";
+  document.getElementById("count").textContent = visibles.length + (visibles.length === 1 ? " par" : " pares");
+  grid.querySelectorAll(".card").forEach(c => c.onclick = () => openV(+c.dataset.i));
+}
+
+const V = document.getElementById("viewer");
+function openV(i){
+  idx = (i + visibles.length) % visibles.length;
+  const p = visibles[idx];
+  document.getElementById("vimg").src = p.img;
+  document.getElementById("vimg").alt = p.nombre;
+  document.getElementById("vref").textContent = "REF. " + p.ref;
+  document.getElementById("vname").textContent = p.nombre;
+  document.getElementById("vtag").textContent = p.tag;
+  document.getElementById("vsize").textContent = p.talla;
+  document.getElementById("vgen").textContent = GEN[p.g];
+  V.classList.add("open"); document.body.style.overflow = "hidden";
+}
+function closeV(){ V.classList.remove("open"); document.body.style.overflow = ""; }
+document.getElementById("vclose").onclick = closeV;
+document.getElementById("vprev").onclick = e => { e.stopPropagation(); openV(idx-1); };
+document.getElementById("vnext").onclick = e => { e.stopPropagation(); openV(idx+1); };
+V.addEventListener("click", e => { if (e.target === V) closeV(); });
+document.addEventListener("keydown", e => {
+  if (!V.classList.contains("open")) return;
+  if (e.key === "Escape") closeV();
+  if (e.key === "ArrowLeft") openV(idx-1);
+  if (e.key === "ArrowRight") openV(idx+1);
+});
+
+render();
+</script>
+</body>
+</html>
