@@ -108,6 +108,16 @@
   .empty-enc .wa{max-width:300px;margin:0 auto}
   .viewer .wa{max-width:340px;margin-top:18px}
   .viewer .sizes-pick .sp{min-width:42px;padding:9px 0}
+
+  .cats{display:none;gap:8px}
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .sw{appearance:none;border:2px solid transparent;border-radius:10px;padding:0;width:58px;height:58px;overflow:hidden;cursor:pointer;background:#1b1b1b}
+  .sw img{width:100%;height:100%;object-fit:cover}
+  .sw.on{border-color:var(--gold)}
+  .col-name{font-size:13px;color:var(--ink);margin-top:8px}
+  .col-name b{color:var(--gold)}
+  .ncol{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.62);color:var(--ink);font:700 11px Inter,sans-serif;padding:5px 9px;border-radius:999px}
+  .viewer-box{max-height:92vh;overflow:auto}
 </style>
 </head>
 <body>
@@ -122,7 +132,7 @@
 
 <div class="tabs">
   <button class="tab on" data-t="disp">Disponibles<small>Entrega inmediata</small></button>
-  <button class="tab" data-t="enc">Por encargo<small>Elige tu talla</small></button>
+  <button class="tab" data-t="enc">Por encargo<small>Elige color y talla</small></button>
 </div>
 <div class="notice" id="notice"><div>
   <span>⏱ Entrega en <b>6 a 8 días</b></span>
@@ -137,6 +147,11 @@
       <button class="chip" data-g="M">Hombre</button>
       <button class="chip" data-g="F">Mujer</button>
     </div>
+    <div class="group cats" id="cats">
+      <button class="chip on" data-c="M">Hombres</button>
+      <button class="chip" data-c="F">Mujeres</button>
+      <button class="chip" data-c="K">Niños</button>
+    </div>
     <div class="group" id="sizes"><span class="lbl">Talla</span></div>
     <div class="count" id="count"></div>
   </div>
@@ -145,11 +160,6 @@
 <main>
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty">No hay pares con ese filtro por ahora.</div>
-  <div class="empty-enc" id="emptyEnc">
-    <h3>Muy pronto nuevos modelos</h3>
-    <p>Estamos subiendo los modelos por encargo. ¿Buscas uno en especial? Escríbenos y te lo conseguimos en tu talla.</p>
-    <a class="wa" target="_blank" rel="noopener" id="encAsk"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.4.7 4.7 1.9 6.7L3 29l6.9-2.1c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.7 12.7-12.6S23 3 16 3zm0 23.1c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4.1 1.2 1.3-4-.3-.4c-1.1-1.7-1.6-3.6-1.6-5.6C5.5 9.8 10.2 5.2 16 5.2s10.5 4.6 10.5 10.4S21.8 26.1 16 26.1zm5.8-7.8c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.5c.2.2 2.4 3.6 5.7 5 .8.3 1.4.5 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg> Pedir un modelo por WhatsApp</a>
-  </div>
 </main>
 
 <footer>
@@ -170,6 +180,7 @@
       <div class="vref" id="vref"></div>
       <h2 id="vname"></h2>
       <p class="vtag" id="vtag"></p>
+      <div id="vcolors"></div>
       <div class="facts" id="vfacts"></div>
       <div id="vpick"></div>
       <a class="wa" id="vwa" target="_blank" rel="noopener"></a>
@@ -179,7 +190,8 @@
 
 <script>
 const WHATSAPP = "573104321666";
-const TALLAS_ENCARGO = { M:[38,39,40,41,42,43], F:[35,36,37,38,39] };
+const TALLAS = { M:[38,39,40,41,42,43], F:[35,36,37,38,39], K:[22,23,24,25,26,27,28,29,30,31,32,33,34] };
+const CATN = { M:"Hombres", F:"Mujeres", K:"Niños" };
 const WA_ICON = `<svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.4.7 4.7 1.9 6.7L3 29l6.9-2.1c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.7 12.7-12.6S23 3 16 3zm0 23.1c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4.1 1.2 1.3-4-.3-.4c-1.1-1.7-1.6-3.6-1.6-5.6C5.5 9.8 10.2 5.2 16 5.2s10.5 4.6 10.5 10.4S21.8 26.1 16 26.1zm5.8-7.8c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.5c.2.2 2.4 3.6 5.7 5 .8.3 1.4.5 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>`;
 
 /* ===== DISPONIBLES =====
@@ -205,31 +217,59 @@ const PRODUCTOS = [
 ];
 
 /* ===== POR ENCARGO =====
-   Ejemplo: {ref:"E01", g:"M", img:"enc01.jpg", nombre:"Nombre del modelo", tag:"Frase corta"},
-   Las tallas salen solas según el género (H 38–43, M 35–39). */
+   cat: "M" hombre · "F" mujer · "U" unisex (sale en Hombres y Mujeres) · "K" niños
+   Para agregar un color: añade {c:"Color", img:"archivo.jpg"} dentro de colores */
 const ENCARGO = [
+  {ref:"E01", cat:"F", nombre:"On Cloudmonster", tag:"Amortiguación máxima y look chunky. El favorito para caminar todo el día.", colores:[{c:"Beige",img:"e01_01.jpg"},{c:"Arena/Lila",img:"e01_02.jpg"},{c:"Blanco/Amarillo",img:"e01_03.jpg"},{c:"Blanco/Coral",img:"e01_04.jpg"},{c:"Blanco/Lima/Lila",img:"e01_05.jpg"},{c:"Blanco/Negro",img:"e01_06.jpg"},{c:"Blanco total",img:"e01_07.jpg"},{c:"Lila/Oliva",img:"e01_08.jpg"},{c:"Menta/Azul",img:"e01_09.jpg"},{c:"Negro/Blanco",img:"e01_10.jpg"},{c:"Negro/Coral",img:"e01_11.jpg"},{c:"Negro total",img:"e01_12.jpg"},{c:"Taupe/Lima",img:"e01_13.jpg"},{c:"Amarillo/Lima",img:"e01_14.jpg"},{c:"Gris/Azul",img:"e01_15.jpg"}]},
+  {ref:"E02", cat:"M", nombre:"Nike Air Max Plus TN", tag:"Diseño agresivo con burbujas Air. Un clásico de la calle.", colores:[{c:"Lacoste blanco/verde",img:"e02_01.jpg"},{c:"Morado degradé",img:"e02_02.jpg"},{c:"Negro/Blanco",img:"e02_03.jpg"},{c:"Voltage morado",img:"e02_04.jpg"}]},
+  {ref:"E03", cat:"F", nombre:"Nike Blazer Low Platform", tag:"Retro con plataforma. Te suma altura y estilo.", colores:[{c:"Blanco/Negro",img:"e03_01.jpg"}]},
+  {ref:"E04", cat:"U", nombre:"Nike Air Zoom Cushion", tag:"Runner liviano y cómodo, fácil de combinar.", colores:[{c:"Blanco/Azul",img:"e04_01.jpg"},{c:"Blanco/Negro",img:"e04_02.jpg"},{c:"Blanco total",img:"e04_03.jpg"},{c:"Gris/Naranja",img:"e04_04.jpg"},{c:"Negro/Blanco",img:"e04_05.jpg"}]},
+  {ref:"E05", cat:"M", nombre:"Adidas Hyperboost", tag:"Suela Boost con mucho rebote. Deportivo y moderno.", colores:[{c:"Blanco",img:"e05_01.jpg"},{c:"Gris/Negro",img:"e05_02.jpg"},{c:"Negro/Rosa",img:"e05_03.jpg"},{c:"Negro/Vinotinto",img:"e05_04.jpg"}]},
+  {ref:"E06", cat:"U", nombre:"Adidas Samba XLG", tag:"El Samba de siempre con suela más alta.", colores:[{c:"Blanco/Gris",img:"e06_01.jpg"},{c:"Blanco/Negro",img:"e06_02.jpg"},{c:"Negro/Caramelo",img:"e06_03.jpg"}]},
+  {ref:"E07", cat:"F", nombre:"Nike Initiator", tag:"Runner retro dosmilero con detalles metálicos.", colores:[{c:"Blanco/Bronce",img:"e07_01.jpg"},{c:"Crema/Bronce",img:"e07_02.jpg"}]},
+  {ref:"E08", cat:"F", nombre:"Nike Dunk Low \"Teddy Bear\"", tag:"Gamuza suave en tonos tierra. Edición especial.", colores:[{c:"Crema/Trigo",img:"e08_01.jpg"}]},
+  {ref:"E09", cat:"F", nombre:"Air Jordan 1 Low", tag:"Un ícono que nunca pasa de moda.", colores:[{c:"Azul/Morado",img:"e09_01.jpg"},{c:"Crema/Negro",img:"e09_02.jpg"}]},
+  {ref:"E10", cat:"F", nombre:"On Cloudtilt", tag:"Suave, liviano y con diseño suizo minimalista.", colores:[{c:"Gris/Crema",img:"e10_01.jpg"}]},
+  {ref:"E11", cat:"M", nombre:"Louis Vuitton Trainer", tag:"Lujo urbano con monograma y detalles en relieve.", colores:[{c:"Blanco/Negro",img:"e11_01.jpg"},{c:"Negro total",img:"e11_02.jpg"}]},
+  {ref:"E12", cat:"F", nombre:"On Cloudrunner", tag:"Estabilidad y comodidad para el día a día.", colores:[{c:"Beige/Amarillo",img:"e12_01.jpg"},{c:"Gris claro",img:"e12_02.jpg"}]},
+  {ref:"E13", cat:"F", nombre:"New Balance 1080", tag:"Espuma Fresh Foam ultra suave. Comodidad premium.", colores:[{c:"Blanco hielo",img:"e13_01.jpg"}]},
+  {ref:"E14", cat:"M", nombre:"New Balance RC 1300", tag:"Estilo retro-tech con suela de tacos.", colores:[{c:"Negro",img:"e14_01.jpg"}]},
+  {ref:"E15", cat:"U", nombre:"Puma Indoor", tag:"Silueta retro de cancha con suela caramelo.", colores:[{c:"Crema/Azul marino",img:"e15_01.jpg"}]},
+  {ref:"E16", cat:"M", nombre:"Puma California", tag:"Clásico de los 80 con plataforma blanca.", colores:[{c:"Azul/Blanco",img:"e16_01.jpg"},{c:"Negro/Blanco",img:"e16_02.jpg"}]},
+  {ref:"E17", cat:"M", nombre:"Nike Air Max INTRLK", tag:"Cámara Air visible y diseño limpio.", colores:[{c:"Negro/Blanco",img:"e17_01.jpg"}]},
+  {ref:"E18", cat:"M", nombre:"Nike Zoom Speed", tag:"Liviano y transpirable para moverte rápido.", colores:[{c:"Negro/Blanco",img:"e18_01.jpg"}]},
+  {ref:"E19", cat:"F", nombre:"Nike Air Force 1", tag:"El AF1 de siempre en gamuza y ediciones especiales.", colores:[{c:"Blanco",img:"e19_01.jpg"},{c:"Taupe",img:"e19_02.jpg"},{c:"Blanco/Rosa",img:"e19_03.jpg"}]},
+  {ref:"E20", cat:"U", nombre:"Puma Suede BMW Motorsport", tag:"Gamuza crema con detalles dorados de M Motorsport.", colores:[{c:"Crema",img:"e20_01.jpg"}]},
+  {ref:"E21", cat:"F", nombre:"Puma Carina", tag:"Plataforma en gamuza con suela caramelo.", colores:[{c:"Gris/Negro",img:"e21_01.jpg"}]},
+  {ref:"E22", cat:"U", nombre:"Puma Club", tag:"Cuero blanco con detalles dorados. Elegante y simple.", colores:[{c:"Blanco/Dorado",img:"e22_01.jpg"}]},
+  {ref:"E23", cat:"F", nombre:"New Balance 9060", tag:"Suela escultural y tonos suaves. Tendencia total.", colores:[{c:"Beige/Rosa",img:"e23_01.jpg"},{c:"Crema/Lila",img:"e23_02.jpg"},{c:"Gris/Crema",img:"e23_03.jpg"},{c:"Blanco/Lila",img:"e23_04.jpg"}]},
+  {ref:"E24", cat:"F", nombre:"Adidas Superstar", tag:"Puntera de concha y tres rayas. Un clásico eterno.", colores:[{c:"Blanco/Azul",img:"e24_01.jpg"},{c:"Crema/Negro",img:"e24_02.jpg"},{c:"Vinotinto/Negro",img:"e24_03.jpg"}]},
+  {ref:"E25", cat:"F", nombre:"Puma Park Lifestyle", tag:"Blanco total con cordones anchos. Combina con todo.", colores:[{c:"Blanco",img:"e25_01.jpg"}]},
+  {ref:"E26", cat:"F", nombre:"Puma Suede XL", tag:"Gamuza inflada y cordones XL. Estilo skater.", colores:[{c:"Café",img:"e26_01.jpg"}]},
+  {ref:"E27", cat:"F", nombre:"Nike V2K Run", tag:"Runner retro con brillos plateados.", colores:[{c:"Crema/Plata",img:"e27_01.jpg"}]},
+  {ref:"E28", cat:"M", nombre:"Air Jordan 1 Mid", tag:"Charol negro con suela hielo. Para destacar.", colores:[{c:"Negro charol",img:"e28_01.jpg"}]},
+  {ref:"E29", cat:"U", nombre:"Adidas Campus 00s", tag:"Gamuza y suela caramelo. El más pedido del momento.", colores:[{c:"Blanco/Azul",img:"e29_01.jpg"},{c:"Blanco/Gris",img:"e29_02.jpg"},{c:"Blanco/Negro",img:"e29_03.jpg"},{c:"Blanco/Verde",img:"e29_04.jpg"},{c:"Gris/Blanco",img:"e29_05.jpg"},{c:"Gris/Negro",img:"e29_06.jpg"}]},
+  {ref:"E30", cat:"K", nombre:"Nike Dunk Low Niños", tag:"Dunk para los más pequeños, cómodos y con estilo.", colores:[{c:"Beige Supreme",img:"e30_01.jpg"},{c:"Blanco/Azul",img:"e30_02.jpg"},{c:"Blanco/café",img:"e30_03.jpg"},{c:"Crema/Negro",img:"e30_04.jpg"},{c:"Negro Supreme",img:"e30_05.jpg"}]},
 ];
 
 const GEN = {M:"Hombre", F:"Mujer"};
-let tab = "disp", fG = "all", fS = null, visibles = [], idx = 0;
-const elegida = {};   // talla elegida por referencia de encargo
+let tab = "disp", fG = "all", fS = null, cat = "M", visibles = [], idx = 0;
+const selCol = {}, selTalla = {};
 
 const wa = txt => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(txt)}`;
+const key = p => p.ref + "|" + cat;
+const colorDe = p => p.colores[selCol[p.ref] || 0];
 const msgDisp = p => `Hola District Shoes 👋 Me interesa el ${p.nombre} (REF. ${p.ref}) en talla ${p.talla}. ¿Está disponible?`;
-const msgEnc  = (p,t) => `Hola District Shoes 👋 Quiero encargar el ${p.nombre} (REF. ${p.ref}) en talla ${t}. ¿Me confirman precio y disponibilidad?`;
-const lista = () => tab === "disp" ? PRODUCTOS : ENCARGO;
-const tallasDe = p => tab === "disp" ? [p.talla] : TALLAS_ENCARGO[p.g];
+const msgEnc  = (p,t) => `Hola District Shoes 👋 Quiero encargar el ${p.nombre} (REF. ${p.ref}), color ${colorDe(p).c}, talla ${t} (${CATN[cat]}). ¿Me confirman precio y disponibilidad?`;
 
 document.getElementById("fab").href = wa("Hola District Shoes 👋 Vi el catálogo y quiero más información.");
-document.getElementById("encAsk").href = wa("Hola District Shoes 👋 Busco un modelo por encargo. ¿Me pueden ayudar?");
-
-const grid = document.getElementById("grid");
-const sizesEl = document.getElementById("sizes");
+const grid = document.getElementById("grid"), sizesEl = document.getElementById("sizes");
 
 function buildSizes(){
   sizesEl.querySelectorAll(".chip").forEach(b => b.remove());
-  const all = tab === "disp" ? PRODUCTOS.map(p => p.talla) : [...TALLAS_ENCARGO.M, ...TALLAS_ENCARGO.F];
-  [...new Set(all)].sort((a,b)=>a-b).forEach(t => {
+  sizesEl.style.display = tab === "disp" ? "" : "none";
+  if (tab !== "disp") return;
+  [...new Set(PRODUCTOS.map(p => p.talla))].sort((a,b)=>a-b).forEach(t => {
     const b = document.createElement("button");
     b.className = "chip size"; b.textContent = t; b.dataset.s = t;
     b.onclick = () => { fS = (fS === t) ? null : t; render(); };
@@ -237,48 +277,58 @@ function buildSizes(){
   });
 }
 document.querySelectorAll("#gender .chip").forEach(b => b.onclick = () => { fG = b.dataset.g; render(); });
+document.querySelectorAll("#cats .chip").forEach(b => b.onclick = () => { cat = b.dataset.c; render(); });
 document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
   tab = b.dataset.t; fS = null;
   document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === b));
   document.getElementById("notice").style.display = tab === "enc" ? "block" : "none";
+  document.getElementById("gender").style.display = tab === "disp" ? "" : "none";
+  document.getElementById("cats").style.display = tab === "enc" ? "flex" : "none";
   buildSizes(); render();
 });
 
+function enCat(p){ return p.cat === cat || (p.cat === "U" && cat !== "K"); }
+
 function pickHTML(p, where){
-  const sel = elegida[p.ref];
-  return `<div class="pick-lbl">Elige tu talla</div><div class="sizes-pick">` +
-    TALLAS_ENCARGO[p.g].map(t => `<button class="sp${sel===t?' on':''}" data-ref="${p.ref}" data-t="${t}" data-w="${where}">${t}</button>`).join("") + `</div>`;
+  const sel = selTalla[key(p)];
+  return `<div class="pick-lbl">Elige tu talla (${CATN[cat]})</div><div class="sizes-pick">` +
+    TALLAS[cat].map(t => `<button class="sp${sel===t?' on':''}" data-ref="${p.ref}" data-t="${t}" data-w="${where}">${t}</button>`).join("") + `</div>`;
 }
 function waBtn(p){
   if (tab === "disp") return `<a class="wa" target="_blank" rel="noopener" href="${wa(msgDisp(p))}">${WA_ICON} Lo quiero</a>`;
-  const t = elegida[p.ref];
+  const t = selTalla[key(p)];
   return t ? `<a class="wa" target="_blank" rel="noopener" href="${wa(msgEnc(p,t))}">${WA_ICON} Encargar talla ${t}</a>`
-           : `<span class="wa off">${WA_ICON} Elige una talla</span>`;
+           : `<span class="wa off">${WA_ICON} Elige color y talla</span>`;
 }
 
 function render(){
   document.querySelectorAll("#gender .chip").forEach(b => b.classList.toggle("on", b.dataset.g === fG));
+  document.querySelectorAll("#cats .chip").forEach(b => b.classList.toggle("on", b.dataset.c === cat));
   document.querySelectorAll("#sizes .chip").forEach(b => b.classList.toggle("on", +b.dataset.s === fS));
-  visibles = lista().filter(p => (fG === "all" || p.g === fG) && (fS === null || tallasDe(p).includes(fS)));
-  grid.innerHTML = visibles.map((p,i) => `
+  visibles = tab === "disp"
+    ? PRODUCTOS.filter(p => (fG === "all" || p.g === fG) && (fS === null || p.talla === fS))
+    : ENCARGO.filter(enCat);
+  grid.innerHTML = visibles.map((p,i) => {
+    const img = tab === "disp" ? p.img : colorDe(p).img;
+    const n = tab === "enc" ? p.colores.length : 0;
+    return `
     <article class="card" data-i="${i}">
       <div class="ph">
-        <img src="${p.img}" alt="${p.nombre}" loading="lazy">
-        <span class="badge">${GEN[p.g]}</span>
-        ${tab === "disp" ? `<span class="size-tag"><small>TALLA</small>${p.talla}</span>` : `<span class="badge enc">Por encargo</span>`}
+        <img src="${img}" alt="${p.nombre}" loading="lazy">
+        ${tab === "disp" ? `<span class="badge">${GEN[p.g]}</span><span class="size-tag"><small>TALLA</small>${p.talla}</span>`
+                         : `<span class="badge enc">Por encargo</span>${n>1?`<span class="ncol">${n} colores</span>`:""}`}
       </div>
       <div class="info">
         <div class="ref">REF. ${p.ref}</div>
         <div class="name">${p.nombre}</div>
         <div class="tag">${p.tag}</div>
-        ${tab === "enc" ? pickHTML(p,"card") : ""}
+        ${tab === "enc" ? `<div class="col-name">Color: <b>${colorDe(p).c}</b>${n>1?" · toca para ver más":""}</div>` + pickHTML(p,"card") : ""}
         ${waBtn(p)}
       </div>
-    </article>`).join("");
-  const vacioEnc = tab === "enc" && ENCARGO.length === 0;
-  document.getElementById("emptyEnc").style.display = vacioEnc ? "block" : "none";
-  document.getElementById("empty").style.display = (!visibles.length && !vacioEnc) ? "block" : "none";
-  document.getElementById("count").textContent = visibles.length + (visibles.length === 1 ? (tab==="disp"?" par":" modelo") : (tab==="disp"?" pares":" modelos"));
+    </article>`}).join("");
+  document.getElementById("empty").style.display = visibles.length ? "none" : "block";
+  const u = tab === "disp" ? ["par","pares"] : ["modelo","modelos"];
+  document.getElementById("count").textContent = visibles.length + " " + (visibles.length === 1 ? u[0] : u[1]);
   grid.querySelectorAll(".card").forEach(c => c.onclick = e => {
     if (e.target.closest(".wa, .sp")) return;
     openV(+c.dataset.i);
@@ -286,10 +336,11 @@ function render(){
 }
 
 document.addEventListener("click", e => {
-  const b = e.target.closest(".sp"); if (!b) return;
+  const b = e.target.closest(".sp, .sw"); if (!b) return;
   e.stopPropagation();
-  elegida[b.dataset.ref] = +b.dataset.t;
-  if (b.dataset.w === "viewer") openV(idx); 
+  if (b.classList.contains("sw")) { selCol[b.dataset.ref] = +b.dataset.k; openV(idx); render(); return; }
+  selTalla[b.dataset.ref + "|" + cat] = +b.dataset.t;
+  if (b.dataset.w === "viewer") openV(idx);
   render();
 });
 
@@ -297,19 +348,22 @@ const V = document.getElementById("viewer");
 function openV(i){
   idx = (i + visibles.length) % visibles.length;
   const p = visibles[idx];
-  document.getElementById("vimg").src = p.img;
-  document.getElementById("vimg").alt = p.nombre;
-  document.getElementById("vref").textContent = "REF. " + p.ref + (tab === "enc" ? " · POR ENCARGO" : "");
+  const vimg = document.getElementById("vimg");
+  vimg.src = tab === "disp" ? p.img : colorDe(p).img; vimg.alt = p.nombre;
+  document.getElementById("vref").textContent = "REF. " + p.ref + (tab === "enc" ? " · POR ENCARGO · " + CATN[cat].toUpperCase() : "");
   document.getElementById("vname").textContent = p.nombre;
   document.getElementById("vtag").textContent = p.tag;
+  document.getElementById("vcolors").innerHTML = tab === "enc"
+    ? `<div class="col-name">Color: <b>${colorDe(p).c}</b></div>` + (p.colores.length > 1 ? `<div class="swatches">` +
+      p.colores.map((c,k) => `<button class="sw${(selCol[p.ref]||0)===k?' on':''}" data-ref="${p.ref}" data-k="${k}" title="${c.c}"><img src="${c.img}" alt="${c.c}"></button>`).join("") + `</div>` : "")
+    : "";
   document.getElementById("vfacts").innerHTML = tab === "disp"
     ? `<div class="fact"><span>Talla</span><b>${p.talla}</b></div><div class="fact"><span>Género</span><b>${GEN[p.g]}</b></div>`
-    : `<div class="fact"><span>Género</span><b>${GEN[p.g]}</b></div><div class="fact"><span>Entrega</span><b>6–8 días</b></div>`;
+    : `<div class="fact"><span>Categoría</span><b>${CATN[cat]}</b></div><div class="fact"><span>Entrega</span><b>6–8 días</b></div>`;
   document.getElementById("vpick").innerHTML = tab === "enc" ? pickHTML(p,"viewer") : "";
-  const vwa = document.getElementById("vwa");
-  const t = elegida[p.ref];
+  const vwa = document.getElementById("vwa"), t = selTalla[key(p)];
   if (tab === "disp") { vwa.className = "wa"; vwa.href = wa(msgDisp(p)); vwa.innerHTML = WA_ICON + " Lo quiero · pedir por WhatsApp"; }
-  else if (t) { vwa.className = "wa"; vwa.href = wa(msgEnc(p,t)); vwa.innerHTML = WA_ICON + " Encargar talla " + t; }
+  else if (t) { vwa.className = "wa"; vwa.href = wa(msgEnc(p,t)); vwa.innerHTML = WA_ICON + " Encargar " + colorDe(p).c + " · talla " + t; }
   else { vwa.className = "wa off"; vwa.removeAttribute("href"); vwa.innerHTML = WA_ICON + " Elige una talla"; }
   V.classList.add("open"); document.body.style.overflow = "hidden";
 }
