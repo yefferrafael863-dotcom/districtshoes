@@ -218,9 +218,10 @@ const PRODUCTOS = [
 
 /* ===== POR ENCARGO =====
    cat: "M" hombre · "F" mujer · "U" unisex (sale en Hombres y Mujeres) · "K" niños
+   Si un color es solo de un género, agrégale g:"M" o g:"F" (ej. {c:"Negro",img:"...",g:"M"})
    Para agregar un color: añade {c:"Color", img:"archivo.jpg"} dentro de colores */
 const ENCARGO = [
-  {ref:"E01", cat:"F", nombre:"On Cloudmonster", tag:"Amortiguación máxima y look chunky. El favorito para caminar todo el día.", colores:[{c:"Beige",img:"e01_01.jpg"},{c:"Arena/Lila",img:"e01_02.jpg"},{c:"Blanco/Amarillo",img:"e01_03.jpg"},{c:"Blanco/Coral",img:"e01_04.jpg"},{c:"Blanco/Lima/Lila",img:"e01_05.jpg"},{c:"Blanco/Negro",img:"e01_06.jpg"},{c:"Blanco total",img:"e01_07.jpg"},{c:"Lila/Oliva",img:"e01_08.jpg"},{c:"Menta/Azul",img:"e01_09.jpg"},{c:"Negro/Blanco",img:"e01_10.jpg"},{c:"Negro/Coral",img:"e01_11.jpg"},{c:"Negro total",img:"e01_12.jpg"},{c:"Taupe/Lima",img:"e01_13.jpg"},{c:"Amarillo/Lima",img:"e01_14.jpg"},{c:"Gris/Azul",img:"e01_15.jpg"}]},
+  {ref:"E01", cat:"U", nombre:"On Cloudmonster", tag:"Amortiguación máxima y look chunky. El favorito para caminar todo el día.", colores:[{c:"Beige",img:"e01_01.jpg",g:"F"},{c:"Arena/Lila",img:"e01_02.jpg",g:"M"},{c:"Blanco/Amarillo",img:"e01_03.jpg",g:"M"},{c:"Blanco/Coral",img:"e01_04.jpg",g:"F"},{c:"Blanco/Lima/Lila",img:"e01_05.jpg",g:"F"},{c:"Blanco/Negro",img:"e01_06.jpg",g:"M"},{c:"Blanco total",img:"e01_07.jpg",g:"M"},{c:"Lila/Oliva",img:"e01_08.jpg",g:"F"},{c:"Menta/Azul",img:"e01_09.jpg",g:"M"},{c:"Negro/Blanco",img:"e01_10.jpg",g:"M"},{c:"Negro/Coral",img:"e01_11.jpg",g:"M"},{c:"Negro total",img:"e01_12.jpg",g:"M"},{c:"Taupe/Lima",img:"e01_13.jpg",g:"M"},{c:"Amarillo/Lima",img:"e01_14.jpg",g:"F"},{c:"Gris/Azul",img:"e01_15.jpg",g:"M"}]},
   {ref:"E02", cat:"M", nombre:"Nike Air Max Plus TN", tag:"Diseño agresivo con burbujas Air. Un clásico de la calle.", colores:[{c:"Lacoste blanco/verde",img:"e02_01.jpg"},{c:"Morado degradé",img:"e02_02.jpg"},{c:"Negro/Blanco",img:"e02_03.jpg"},{c:"Voltage morado",img:"e02_04.jpg"}]},
   {ref:"E03", cat:"F", nombre:"Nike Blazer Low Platform", tag:"Retro con plataforma. Te suma altura y estilo.", colores:[{c:"Blanco/Negro",img:"e03_01.jpg"}]},
   {ref:"E04", cat:"U", nombre:"Nike Air Zoom Cushion", tag:"Runner liviano y cómodo, fácil de combinar.", colores:[{c:"Blanco/Azul",img:"e04_01.jpg"},{c:"Blanco/Negro",img:"e04_02.jpg"},{c:"Blanco total",img:"e04_03.jpg"},{c:"Gris/Naranja",img:"e04_04.jpg"},{c:"Negro/Blanco",img:"e04_05.jpg"}]},
@@ -229,9 +230,9 @@ const ENCARGO = [
   {ref:"E07", cat:"F", nombre:"Nike Initiator", tag:"Runner retro dosmilero con detalles metálicos.", colores:[{c:"Blanco/Bronce",img:"e07_01.jpg"},{c:"Crema/Bronce",img:"e07_02.jpg"}]},
   {ref:"E08", cat:"F", nombre:"Nike Dunk Low \"Teddy Bear\"", tag:"Gamuza suave en tonos tierra. Edición especial.", colores:[{c:"Crema/Trigo",img:"e08_01.jpg"}]},
   {ref:"E09", cat:"F", nombre:"Air Jordan 1 Low", tag:"Un ícono que nunca pasa de moda.", colores:[{c:"Azul/Morado",img:"e09_01.jpg"},{c:"Crema/Negro",img:"e09_02.jpg"}]},
-  {ref:"E10", cat:"F", nombre:"On Cloudtilt", tag:"Suave, liviano y con diseño suizo minimalista.", colores:[{c:"Gris/Crema",img:"e10_01.jpg"}]},
+  {ref:"E10", cat:"M", nombre:"On Cloudtilt", tag:"Suave, liviano y con diseño suizo minimalista.", colores:[{c:"Gris/Crema",img:"e10_01.jpg"}]},
   {ref:"E11", cat:"M", nombre:"Louis Vuitton Trainer", tag:"Lujo urbano con monograma y detalles en relieve.", colores:[{c:"Blanco/Negro",img:"e11_01.jpg"},{c:"Negro total",img:"e11_02.jpg"}]},
-  {ref:"E12", cat:"F", nombre:"On Cloudrunner", tag:"Estabilidad y comodidad para el día a día.", colores:[{c:"Beige/Amarillo",img:"e12_01.jpg"},{c:"Gris claro",img:"e12_02.jpg"}]},
+  {ref:"E12", cat:"U", nombre:"On Cloudrunner", tag:"Estabilidad y comodidad para el día a día.", colores:[{c:"Beige/Amarillo",img:"e12_01.jpg",g:"F"},{c:"Gris claro",img:"e12_02.jpg",g:"M"}]},
   {ref:"E13", cat:"F", nombre:"New Balance 1080", tag:"Espuma Fresh Foam ultra suave. Comodidad premium.", colores:[{c:"Blanco hielo",img:"e13_01.jpg"}]},
   {ref:"E14", cat:"M", nombre:"New Balance RC 1300", tag:"Estilo retro-tech con suela de tacos.", colores:[{c:"Negro",img:"e14_01.jpg"}]},
   {ref:"E15", cat:"U", nombre:"Puma Indoor", tag:"Silueta retro de cancha con suela caramelo.", colores:[{c:"Crema/Azul marino",img:"e15_01.jpg"}]},
@@ -258,7 +259,8 @@ const selCol = {}, selTalla = {};
 
 const wa = txt => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(txt)}`;
 const key = p => p.ref + "|" + cat;
-const colorDe = p => p.colores[selCol[p.ref] || 0];
+const colsDe = p => p.colores.filter(c => !c.g || c.g === cat || (c.g === "U" && cat !== "K"));
+const colorDe = p => colsDe(p)[selCol[key(p)] || 0] || p.colores[0];
 const msgDisp = p => `Hola District Shoes 👋 Me interesa el ${p.nombre} (REF. ${p.ref}) en talla ${p.talla}. ¿Está disponible?`;
 const msgEnc  = (p,t) => `Hola District Shoes 👋 Quiero encargar el ${p.nombre} (REF. ${p.ref}), color ${colorDe(p).c}, talla ${t} (${CATN[cat]}). ¿Me confirman precio y disponibilidad?`;
 
@@ -287,7 +289,7 @@ document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
   buildSizes(); render();
 });
 
-function enCat(p){ return p.cat === cat || (p.cat === "U" && cat !== "K"); }
+function enCat(p){ if (p.colores.some(c => c.g)) return cat !== "K" && colsDe(p).length > 0; return p.cat === cat || (p.cat === "U" && cat !== "K"); }
 
 function pickHTML(p, where){
   const sel = selTalla[key(p)];
@@ -310,7 +312,7 @@ function render(){
     : ENCARGO.filter(enCat);
   grid.innerHTML = visibles.map((p,i) => {
     const img = tab === "disp" ? p.img : colorDe(p).img;
-    const n = tab === "enc" ? p.colores.length : 0;
+    const n = tab === "enc" ? colsDe(p).length : 0;
     return `
     <article class="card" data-i="${i}">
       <div class="ph">
@@ -338,7 +340,7 @@ function render(){
 document.addEventListener("click", e => {
   const b = e.target.closest(".sp, .sw"); if (!b) return;
   e.stopPropagation();
-  if (b.classList.contains("sw")) { selCol[b.dataset.ref] = +b.dataset.k; openV(idx); render(); return; }
+  if (b.classList.contains("sw")) { selCol[b.dataset.ref + "|" + cat] = +b.dataset.k; openV(idx); render(); return; }
   selTalla[b.dataset.ref + "|" + cat] = +b.dataset.t;
   if (b.dataset.w === "viewer") openV(idx);
   render();
@@ -354,8 +356,8 @@ function openV(i){
   document.getElementById("vname").textContent = p.nombre;
   document.getElementById("vtag").textContent = p.tag;
   document.getElementById("vcolors").innerHTML = tab === "enc"
-    ? `<div class="col-name">Color: <b>${colorDe(p).c}</b></div>` + (p.colores.length > 1 ? `<div class="swatches">` +
-      p.colores.map((c,k) => `<button class="sw${(selCol[p.ref]||0)===k?' on':''}" data-ref="${p.ref}" data-k="${k}" title="${c.c}"><img src="${c.img}" alt="${c.c}"></button>`).join("") + `</div>` : "")
+    ? `<div class="col-name">Color: <b>${colorDe(p).c}</b></div>` + (colsDe(p).length > 1 ? `<div class="swatches">` +
+      colsDe(p).map((c,k) => `<button class="sw${(selCol[key(p)]||0)===k?' on':''}" data-ref="${p.ref}" data-k="${k}" title="${c.c}"><img src="${c.img}" alt="${c.c}"></button>`).join("") + `</div>` : "")
     : "";
   document.getElementById("vfacts").innerHTML = tab === "disp"
     ? `<div class="fact"><span>Talla</span><b>${p.talla}</b></div><div class="fact"><span>Género</span><b>${GEN[p.g]}</b></div>`
